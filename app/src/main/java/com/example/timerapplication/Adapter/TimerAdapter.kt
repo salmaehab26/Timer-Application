@@ -14,7 +14,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class TimerAdapter : RecyclerView.Adapter<TimerAdapter.ViewHolder>() {
+class TimerAdapter(private val onDelete: (Long) -> Unit) : RecyclerView.Adapter<TimerAdapter.ViewHolder>() {
 
     private val timerList = mutableListOf<TimerModel>()
     private var countdownJob: Job? = null
@@ -25,6 +25,9 @@ class TimerAdapter : RecyclerView.Adapter<TimerAdapter.ViewHolder>() {
             binding.textName.text = item.name
             binding.textDescr.text = item.description
             binding.textTime.text = formatMillis(item.remainingTime)
+            binding.delete.setOnClickListener {
+                onDelete(item.id)
+            }
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,7 +37,7 @@ class TimerAdapter : RecyclerView.Adapter<TimerAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(timerList[position])
-    }
+     }
 
     override fun getItemCount(): Int = timerList.size
 

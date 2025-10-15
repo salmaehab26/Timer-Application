@@ -2,6 +2,8 @@ package com.example.timerapplication.ui
 
 import TimerAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -15,6 +17,7 @@ import com.example.timerapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: TimerViewModel by viewModels()
+    private val REQUEST_POST_NOTIF = 1001
 
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +27,9 @@ class MainActivity : AppCompatActivity() {
         binding.timerViewModel = viewModel
         binding.lifecycleOwner = this
 
-        val adapter = TimerAdapter()
+        val adapter = TimerAdapter { id ->
+            viewModel.deleteTimer(id)
+        }
         binding.rvTimerList.adapter = adapter
         binding.rvTimerList.layoutManager = LinearLayoutManager(this)
 
@@ -34,6 +39,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.bnAdd.setOnClickListener {
             startActivity(Intent(this, AddTimerActivity::class.java))
+        }
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_POST_NOTIF)
+            }
         }
     }
     override fun onResume() {

@@ -5,11 +5,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.example.timerapplication.data.TimerModel
 import com.example.timerapplication.data.TimerRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import scheduleNotification
+import java.util.UUID
 
 class TimerViewModel(application: Application) : AndroidViewModel(application) {
     private val repo = TimerRepository(application.applicationContext)
@@ -34,27 +36,22 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
 
         repo.saveTimers(currentList)
         _timers.postValue(currentList)
+        val ctx = getApplication<Application>().applicationContext
+        scheduleNotification(ctx, timer)
+    }
+    fun deleteTimer(id: Long) = viewModelScope.launch(Dispatchers.IO) {
+        val currentList = repo.loadTimers()
+        val updated = currentList.filter { it.id != id }.toMutableList()
+
+        repo.saveTimers(updated)
+        _timers.postValue(updated)
+
         val context = getApplication<Application>().applicationContext
-        scheduleNotification(context, timer)
+        cancelScheduledNotification(context, id)
     }
 
-
-//
-//    fun scheduleNotification( timer: TimerModel) {
-//        val context = getApplication<Application>().applicationContext
-//        val delayMillis = (timer.endTimeMillis - System.currentTimeMillis()) - 5 * 60 * 1000
-//
-//        if (delayMillis > 0) {
-//            val data = androidx.work.Data.Builder()
-//                .putString("TIMER_NAME", timer.name)
-//                .build()
-//
-//            val request = androidx.work.OneTimeWorkRequestBuilder<com.example.timerapplication.data.NotificationWorker>()
-//                .setInitialDelay(delayMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
-//                .setInputData(data)
-//                .build()
-//
-//            androidx.work.WorkManager.getInstance(context).enqueue(request)
-//        }
-//    }
+    private fun cancelScheduledNotification(context: android.content.Context, id: Long) {
+        val uuid = UUID.nameUUIDFromBytes(id.toString().toByteArray())
+        WorkManager.getInstance(context).cancelWorkById(uuid)
+    }
 }
