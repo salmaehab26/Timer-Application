@@ -7,8 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.timerapplication.R
-import com.example.timerapplication.ViewModel.TimerViewModel
+import com.example.timerapplication.data.TimerRepository
+import com.example.timerapplication.viewModel.TimerViewModel
 import com.example.timerapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,21 +20,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding= ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.viewModel = viewModel
+        binding.timerViewModel = viewModel
         binding.lifecycleOwner = this
 
         val adapter = TimerAdapter()
         binding.rvTimerList.adapter = adapter
+        binding.rvTimerList.layoutManager = LinearLayoutManager(this)
 
         viewModel.timers.observe(this) { list ->
-            adapter.updateList(list)
+            adapter.setTimers(list)
         }
 
         binding.bnAdd.setOnClickListener {
             startActivity(Intent(this, AddTimerActivity::class.java))
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        viewModel.load()
     }
 }

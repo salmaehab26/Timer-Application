@@ -6,13 +6,14 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="com.example.timerapplication.ViewModel.TimerViewModel" />
+            name="timerViewModel"
+            type="com.example.timerapplication.viewModel.TimerViewModel" />
     </data>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity"

@@ -17,6 +17,10 @@ class DIffUtils(
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition] == newList[newItemPosition]
+        val old = oldList[oldItemPosition]
+        val new = newList[newItemPosition]
+        return old.name == new.name &&
+                old.description == new.description &&
+                old.endTimeMillis == new.endTimeMillis
     }
 }
