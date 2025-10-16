@@ -10,7 +10,7 @@ class TimerRepository(private val context: Context) {
     private val keyTimers = "timers_list"
     private val gson = Gson()
 
-    private val prefs get() = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
 
     fun loadTimers(): MutableList<TimerModel> {
         val json = prefs.getString(keyTimers, null) ?: return mutableListOf()

@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvTimerList.layoutManager = LinearLayoutManager(this)
 
         viewModel.timers.observe(this) { list ->
-            adapter.setTimers(list)
+            adapter.updateTimers(list)
         }
 
         binding.bnAdd.setOnClickListener {

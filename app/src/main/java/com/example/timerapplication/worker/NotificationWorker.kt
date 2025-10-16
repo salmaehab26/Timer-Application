@@ -15,15 +15,16 @@ class NotificationWorker(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val title = inputData.getString(KEY_TITLE) ?: "Timer Reminder"
-        val message = inputData.getString(KEY_MESSAGE) ?: "5 minutes remaining"
+        val title = inputData.getString("TIMER_NAME") ?: "Timer Reminder"
+        val message = "5 minutes remaining"
         showNotification(title, message)
         return Result.success()
     }
 
-     fun showNotification(title: String, message: String) {
+    fun showNotification(title: String, message: String) {
         val channelId = "timer_channel_id"
-        val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val manager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel =
@@ -32,7 +33,7 @@ class NotificationWorker(
         }
 
         val notif = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.notification_bell)
+            .setSmallIcon(R.drawable.active)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
@@ -42,8 +43,4 @@ class NotificationWorker(
         manager.notify(title.hashCode() + (System.currentTimeMillis() % 1000).toInt(), notif)
     }
 
-    companion object {
-        const val KEY_TITLE = "title"
-        const val KEY_MESSAGE = "message"
-    }
 }

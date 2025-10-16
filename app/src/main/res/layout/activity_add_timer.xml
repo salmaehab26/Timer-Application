@@ -1,26 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data />
+    <data>
 
-    <LinearLayout
+        <variable
+            name="timerViewModel"
+            type="com.example.timerapplication.viewModel.TimerViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:fitsSystemWindows="true"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <EditText
-            android:id="@+id/inputTitle"
-            android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tfl_name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Title" />
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="150dp"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/inputDesc"
-            android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tf_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:text="@={timerViewModel.timerName}"
+                android:hint="Enter timer name" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tfl_description"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Description" />
+            android:layout_margin="16dp"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:layout_constraintBottom_toTopOf="@id/saveButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tfl_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tf_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:text="@={timerViewModel.timerDescription}"
+                android:hint="Enter journey description" />
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/pickDateTime"
@@ -28,15 +73,29 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_button"
-            android:text="Pick time" />
+            android:text="Pick time"
+            app:layout_constraintEnd_toStartOf="@id/saveButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tfl_description" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_button"
-            android:text="Save" />
-    </LinearLayout>
+            android:text="Save"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pickDateTime"
+            app:layout_constraintTop_toBottomOf="@id/tfl_description" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/saveButton" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

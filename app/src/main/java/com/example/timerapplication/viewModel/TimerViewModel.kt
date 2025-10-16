@@ -14,6 +14,8 @@ import scheduleNotification
 import java.util.UUID
 
 class TimerViewModel(application: Application) : AndroidViewModel(application) {
+    val timerName = MutableLiveData<String>()
+    val timerDescription = MutableLiveData<String>()
     private val repo = TimerRepository(application.applicationContext)
 
     private val _timers = MutableLiveData<MutableList<TimerModel>>(mutableListOf())
@@ -42,13 +44,13 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteTimer(id: Long) = viewModelScope.launch(Dispatchers.IO) {
         val currentList = repo.loadTimers()
         val updated = currentList.filter { it.id != id }.toMutableList()
-
         repo.saveTimers(updated)
         _timers.postValue(updated)
 
         val context = getApplication<Application>().applicationContext
         cancelScheduledNotification(context, id)
     }
+
 
     private fun cancelScheduledNotification(context: android.content.Context, id: Long) {
         val uuid = UUID.nameUUIDFromBytes(id.toString().toByteArray())

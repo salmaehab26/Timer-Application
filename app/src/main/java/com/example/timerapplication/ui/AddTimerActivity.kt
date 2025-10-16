@@ -3,6 +3,7 @@ package com.example.timerapplication.ui
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -24,14 +25,22 @@ class AddTimerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_timer)
-
+        binding.timerViewModel = vm
+        binding.lifecycleOwner = this
         binding.pickDateTime.setOnClickListener { pickDateTime() }
 
         binding.saveButton.setOnClickListener {
-            val title = binding.inputTitle.text.toString().trim()
-            val desc = binding.inputDesc.text.toString().trim()
-            if (title.isEmpty() || chosenMillis == 0L) return@setOnClickListener
+            val title = vm.timerName.value
+            val desc = vm.timerDescription.value
+            if (title.isNullOrEmpty() ||desc.isNullOrEmpty() || chosenMillis == 0L) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
 
+                return@setOnClickListener
+            }
+            if (chosenMillis <= System.currentTimeMillis()) {
+                Toast.makeText(this, "Please choose a future time", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val timer = TimerModel(name = title, description = desc, endTimeMillis = chosenMillis)
             vm.addTimer(timer)
             scheduleNotification(this.applicationContext, timer)
@@ -39,19 +48,23 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+
     private fun pickDateTime() {
         val cal = Calendar.getInstance()
-        DatePickerDialog(this, { _, y, m, d ->
-            cal.set(Calendar.YEAR, y)
-            cal.set(Calendar.MONTH, m)
-            cal.set(Calendar.DAY_OF_MONTH, d)
+
+        DatePickerDialog(this, { _, year, month, day ->
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, month)
+            cal.set(Calendar.DAY_OF_MONTH, day)
+
             TimePickerDialog(this, { _, hour, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
                 cal.set(Calendar.SECOND, 0)
                 chosenMillis = cal.timeInMillis
-                binding.pickDateTime.text = SimpleDateFormat("yyyy-MM-dd HH:mm").format(cal.time)
+                binding.tvTime.text = SimpleDateFormat("dd/MM/yyyy HH:mm").format(cal.time)
             }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
     }
 }

@@ -22,14 +22,14 @@ class TimerAdapter(private val onDelete: (Long) -> Unit) : RecyclerView.Adapter<
     inner class ViewHolder(val binding: TimerItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: TimerModel) {
-            binding.textName.text = item.name
-            binding.textDescr.text = item.description
-            binding.textTime.text = formatMillis(item.remainingTime)
+            binding.timer = item
             binding.delete.setOnClickListener {
                 onDelete(item.id)
             }
+
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = TimerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
@@ -37,11 +37,11 @@ class TimerAdapter(private val onDelete: (Long) -> Unit) : RecyclerView.Adapter<
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(timerList[position])
-     }
+    }
 
     override fun getItemCount(): Int = timerList.size
 
-    fun setTimers(newList: List<TimerModel>) {
+    fun updateTimers(newList: List<TimerModel>) {
         val diff = DIffUtils(timerList, newList)
         val result = DiffUtil.calculateDiff(diff)
         timerList.clear()
@@ -51,17 +51,16 @@ class TimerAdapter(private val onDelete: (Long) -> Unit) : RecyclerView.Adapter<
         startCountdowns()
     }
 
-    private fun startCountdowns() {
+    fun startCountdowns() {
         countdownJob?.cancel()
         countdownJob = CoroutineScope(Dispatchers.Main).launch {
             while (isActive) {
                 val now = System.currentTimeMillis()
                 for ((index, timer) in timerList.withIndex()) {
                     val newRemaining = (timer.endTimeMillis - now).coerceAtLeast(0)
-                    if (newRemaining != timer.remainingTime) {
                         timer.remainingTime = newRemaining
-                        notifyItemChanged(index, "timeOnly") // partial update
-                    }
+                        notifyItemChanged(index, "timeOnly")
+
                 }
                 delay(1000)
             }
@@ -74,16 +73,13 @@ class TimerAdapter(private val onDelete: (Long) -> Unit) : RecyclerView.Adapter<
         payloads: MutableList<Any>
     ) {
         if (payloads.contains("timeOnly")) {
-            holder.binding.textTime.text = formatMillis(timerList[position].remainingTime)
+            holder.binding.invalidateAll()
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }
-
-    private fun formatMillis(ms: Long): String {
-        val hours = TimeUnit.MILLISECONDS.toHours(ms)
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(ms) % 60
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(ms) % 60
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        countdownJob?.cancel()
     }
 }

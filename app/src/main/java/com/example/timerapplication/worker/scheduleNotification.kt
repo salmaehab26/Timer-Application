@@ -22,7 +22,7 @@ fun scheduleNotification(context: Context, timer: TimerModel) {
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            timer.name,
+            timer.id.toString(),
             ExistingWorkPolicy.REPLACE,
             request
         )
